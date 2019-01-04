@@ -66,4 +66,5 @@ upnewsrouter.post('/upnewsrouter/upload',multer({storage:storage}).array('files'
 upnewsrouter.get('/upnewsrouter/getnews',upnewscontroller.getnews);
 upnewsrouter.post('/upnewsrouter/deletepart',upnewscontroller.deletepart);
 upnewsrouter.post('/upnewsrouter/changepart',multer({storage:storage2}).single('file'),upnewscontroller.updatepart);
+upnewsrouter.post('/upnewsrouter/deleteparts',upnewscontroller.deleteparts);
 module.exports=upnewsrouter;

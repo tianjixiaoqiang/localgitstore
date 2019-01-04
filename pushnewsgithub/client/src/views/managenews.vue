@@ -3,29 +3,33 @@
         <h1 class="main-label">这里是新闻编辑界面</h1>
         <div class="managebox">
             <div class="managemenu">
-                <el-button type="danger" icon="el-icon-delete" round size="small">批量删除</el-button>
+                <el-button type="danger" icon="el-icon-delete" round size="small" @click="deletesome">批量删除</el-button>
                 <span>排序:</span>
                 <el-select v-model="selectvalue" placeholder="请选择" size="small" style="width:100px;" clearable>
                     <el-option value="日期"></el-option>
                     <el-option value="类型"></el-option>
+                    <el-option value="标题"></el-option>
                     <el-option value="作者"></el-option>
                 </el-select>
-                <el-button type="primary" size="small">切换成{{order}}</el-button>
+                <el-button type="primary" size="small" @click="sortbycol">切换成{{order}}</el-button>
                 <el-select v-model="selectvalue2" placeholder="选择搜索类型" size="small" style="margin-left: 10px;width:150px;" clearable>
                     <el-option value="id"></el-option>
                     <el-option value="日期"></el-option>
                     <el-option value="类型"></el-option>
+                    <el-option value="标题"></el-option>
                     <el-option value="作者"></el-option>
                     <el-option value="描述字"></el-option>
                 </el-select>
                 <el-input v-model="keyword" placeholder="请输入搜索关键字" size="small" style="display: inline-block;width:160px;" clearable></el-input>
                 <el-button type="primary" icon="el-icon-search" size="small" @click="search">搜索</el-button>
+                <el-button type="primary" size="small" @click="reflush">刷新</el-button>
                 <el-button type="primary" size="small" @click="jumptoupnews">上传<i class="el-icon-upload el-icon--right"></i></el-button>
             </div>
             <div class="managetabel">
                 <el-table
                         :data="pagedata"
                         border
+                        @selection-change="handleSelectionChange"
                         >
                     <el-table-column type="expand">
                         <template slot-scope="props">
@@ -38,6 +42,9 @@
                                 </el-form-item>
                                 <el-form-item label="类型">
                                     <span style="color:#113a30;">{{ props.row.newstype }}</span>
+                                </el-form-item>
+                                <el-form-item label="所属标题">
+                                    <span style="color:#113a30;">{{ props.row.news_label}}</span>
                                 </el-form-item>
                                 <el-form-item label="作者">
                                     <span style="color:#183a11;">{{ props.row.writer }}</span>
@@ -67,6 +74,13 @@
                     <el-table-column
                             prop="newstype"
                             label="类型"
+                            width="120">
+                    </el-table-column>
+                    <el-table-column
+                            :show-overflow-tooltip="true"
+                            sortable
+                            prop="news_label"
+                            label="标题"
                             width="120">
                     </el-table-column>
                     <el-table-column
@@ -153,6 +167,7 @@
         name: "managenews",
         data() {
             return {
+                   deletearr:[],
                    keyword:'',
                    order:'逆序',
                    selectvalue:'',
@@ -292,6 +307,11 @@
                                 val.res_msg=this.form.res_msg;
                             }
                         }.bind(this));
+                        this.searchtableData.forEach(function (val,index,array) {
+                            if(val._id==this.form._id&&val.change_index==this.form.change_index){
+                                val.res_msg=this.form.res_msg;
+                            }
+                        }.bind(this));
                         this.$message({
                             message:'修改成功',
                             type:'success'
@@ -314,6 +334,11 @@
                 this.$axios.post('/api/upnewsrouter/deletepart',{_id:id,delete_url:delete_url}).then(res=>{
                     if(res.data=='删除成功'){
                         this.tableData.forEach(function (val,index,array) {
+                            if(val._id==id&&val.delete_url==delete_url){
+                                array.splice(index,1);
+                            }
+                        });
+                        this.searchtableData.forEach(function (val,index,array) {
                             if(val._id==id&&val.delete_url==delete_url){
                                 array.splice(index,1);
                             }
@@ -354,14 +379,166 @@
                 }
                 var searchtype=this.selectvalue2;
                 this.searchtableData=this.tableData.concat();
+                var temparr=[];
+                var pattern=new RegExp(this.keyword);
                 if(searchtype=='id'){
-
+                  this.searchtableData.forEach((val,index,arr)=>{
+                      if(pattern.test(val._id)){
+                          temparr.push(val);
+                      }
+                  })
                 }
-                if(searchtype=='日期'){}
-                if(searchtype=='类型'){}
-                if(searchtype=='作者'){}
-                if(searchtype=='描述字'){}
+                if(searchtype=='日期'){
+                    this.searchtableData.forEach((val,index,arr)=>{
+                        if(pattern.test(val.date)){
+                            temparr.push(val);
+                        }
+                    })
+                }
+                if(searchtype=='类型'){
+                    this.searchtableData.forEach((val,index,arr)=>{
+                        if(pattern.test(val.newstype)){
+                            temparr.push(val);
+                        }
+                    })
+                }
+                if(searchtype=='标题'){
+                    this.searchtableData.forEach((val,index,arr)=>{
+                        if(pattern.test(val.news_label)){
+                            temparr.push(val);
+                        }
+                    })
+                }
+                if(searchtype=='作者'){
+                    this.searchtableData.forEach((val,index,arr)=>{
+                        if(pattern.test(val.writer)){
+                            temparr.push(val);
+                        }
+                    })
+                }
+                if(searchtype=='描述字'){
+                    this.searchtableData.forEach((val,index,arr)=>{
+                        if(pattern.test(val.res_msg)){
+                            temparr.push(val);
+                        }
+                    })
+                }
+                this.tableData=temparr;
             },
+            reflush(){
+                this.tableData=this.searchtableData.concat();
+                this.searchtableData=[];
+            },
+            sortbycol(){
+                if(!this.selectvalue){
+                    this.$message({
+                        message:'请选择排序列',
+                        type:"warning"
+                    });
+                    return;
+                }
+                if(this.selectvalue=='日期'){
+                    if(this.order=='逆序'){
+                        this.tableData.sort(function (a,b) {
+                            return b.date.localeCompare(a.date);
+                        })
+                        this.order='顺序';
+                    }else{
+                        this.tableData.sort(function (a,b) {
+                            return a.date.localeCompare(b.date);
+                        })
+                        this.order='逆序';
+                    }
+                }
+                if(this.selectvalue=='类型'){
+                    if(this.order=='逆序'){
+                        this.tableData.sort(function (a,b) {
+                            return b.newstype.localeCompare(a.newstype,'zh');
+                        })
+                        this.order='顺序';
+                    }else{
+                        this.tableData.sort(function (a,b) {
+                            return a.newstype.localeCompare(b.newstype,'zh');
+                        })
+                        this.order='逆序';
+                    }
+                }
+                if(this.selectvalue=='标题'){
+                    if(this.order=='逆序'){
+                        this.tableData.sort(function (a,b) {
+                            return b.news_label.localeCompare(a.news_label,'zh');
+                        })
+                        this.order='顺序';
+                    }else{
+                        this.tableData.sort(function (a,b) {
+                            return a.news_label.localeCompare(b.news_label,'zh');
+                        })
+                        this.order='逆序';
+                    }
+                }
+                if(this.selectvalue=='作者'){
+                    if(this.order=='逆序'){
+                        this.tableData.sort(function (a,b) {
+                            return b.writer.localeCompare(a.writer,'zh');
+                        })
+                        this.order='顺序';
+                    }else{
+                        this.tableData.sort(function (a,b) {
+                            return a.writer.localeCompare(b.writer,'zh');
+                        })
+                        this.order='逆序';
+                    }
+                }
+            },
+            handleSelectionChange(val){
+                this.deletearr=val;
+            },
+            deletesome(){
+                this.$confirm('确认删除？', '批量删除', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    center: true
+                }).then(() => {
+                    if(this.deletearr.length==0){return;}
+                    var deletearr=this.deletearr.map(function (val,index,arr) {
+                        return {
+                            _id:val._id,
+                            res_url:val.delete_url
+                        }
+                    });
+                    this.$axios.post('/api/upnewsrouter/deleteparts',{deletearr:deletearr}).then(res=>{
+                        if(res.data=='删除成功'){
+                            deletearr.forEach((val,index,arr)=>{
+                                this.tableData.forEach((val2,index2,array2)=>{
+                                    if(val._id==val2._id&&val.res_url==val2.delete_url){
+                                        array2.splice(index2,1);
+                                    }
+                                });
+                                this.searchtableData.forEach((val2,index2,array2)=>{
+                                    if(val._id==val2._id&&val.res_url==val2.delete_url){
+                                        array2.splice(index2,1);
+                                    }
+                                });
+                            });
+                            this.$message({
+                                message:'删除成功',
+                                type:'success'
+                            });
+                        }else{
+                            this.$message({
+                                message:'删除失败',
+                                type:'error'
+                            })
+                        }
+                    }).catch(err=>{})
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            }
         },
         computed:{
             totallength(){
@@ -395,11 +572,11 @@
     }
     .managebox{
         .managemenu{
-            margin-left:100px;
+            margin-left:50px;
             margin-bottom:10px;
         }
         .managetabel{
-            width:803px;
+            width:923px;
             margin:0 auto;
             img{
                 width:200px;

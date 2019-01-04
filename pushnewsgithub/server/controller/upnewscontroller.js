@@ -102,5 +102,54 @@ module.exports={
                 res.end();
             })
         })
+    },
+    deleteparts(req,res){
+        var deletearr=req.body.deletearr;
+        var deleteobj={};
+        deletearr.forEach(function (value, index, array) {
+            if(deleteobj[value._id]){
+                deleteobj[value._id].push(value.res_url);
+            }else{
+                deleteobj[value._id]=[value.res_url];
+            }
+        });
+        //console.log(deletearr);
+        var promises=[];//可以用event事件优化速度
+        for(var id in deleteobj){
+           var promise=new Promise((resolve,reject)=>{
+               var _id=id;
+               var delete_urls=deleteobj[id];
+               News.findOne({_id:_id},function (err,doc) {
+                   if(err){console.log(err);reject(err)}
+                   if(doc.resourse_url.length==delete_urls.length){
+                       News.deleteOne({_id:_id},function (err) {
+                           if(err){
+                               console.log(err);
+                               reject(err);
+                           }
+                           resolve();
+                       })
+                   }else{
+                       var resourse_url=doc.resourse_url;
+                       var resourse_msg=doc.resourse_desc;
+                       delete_urls.forEach(function (val,index2,arr) {
+                           var index3=resourse_url.indexOf(val);
+                           if(index3==-1){reject();}
+                           resourse_url.splice(index3,1);
+                           resourse_msg.splice(index3,1);
+                       });
+                       News.updateOne({_id:_id},{$set:{resourse_url:resourse_url,resourse_desc:resourse_msg}},function (err,result) {
+                           if(err){console.log(err);reject(err);}
+                           resolve();
+                       })
+                   }
+               })
+           })
+           promises.push(promise);
+        }
+        Promise.all(promises).then(()=>{
+            res.send('删除成功');
+            res.end();
+        }).catch(err=>{})
     }
 }
