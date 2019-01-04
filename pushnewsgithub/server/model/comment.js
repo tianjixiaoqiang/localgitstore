@@ -1,10 +1,12 @@
 var mongoose=require('../db');
 var Schema = mongoose.Schema;
 var commentSchema=new Schema({
-    _id:'',
+    userid:'',
     username:'',
-    body:'',
+    msgbody:'',
     part:'',
-    praise:{type:Number,default:0}
+    pushtime:{type:Date,default:Date.now()},
+    comments_id:{type:Array,default:[]},
+    praise:{type:Array,default:[]}
 },{versionKey: false});
 module.exports = mongoose.model('Comments',commentSchema);
