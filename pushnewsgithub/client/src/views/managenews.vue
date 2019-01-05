@@ -182,7 +182,7 @@
                        change_index:0
                    },
                    tableData:[
-                       {
+                       /*{
                            _id:'sddsfsgdgdfsfdff',
                            date:'201901010916',
                            newstype:'社会',
@@ -193,7 +193,7 @@
                            res_msg:'adsfsfsdsdsdsdsdsdsdsdsdsdsdsdgfdgfgfdfsdgdgdfdfdhfjfffdgfhjgj',
                            delete_url:'',
                            change_index:0
-                       }
+                       }*/
                    ],
                    searchtableData:[],
                    pagetableData:[],
@@ -203,11 +203,9 @@
             }
         },
         methods: {
-            init(){
-                //console.log('shownews58');
+            init(){//初始化表格数据
                 this.$axios.get('/api/upnewsrouter/getnews',{}).then(res=>{
                     if(res.data){
-                        //console.log(res.data);
                         if(res.data instanceof Array){
                             res.data.forEach(function (val,index,arr) {
                                 var msgs=val.resourse_desc.map(function (val,index,arr) {
@@ -221,7 +219,6 @@
                                 val.resourse_url.forEach(function (val,index,arr) {
                                     var obj={};
                                     var val2='../../../server/'+val;
-                                    //if(val2===`../../../server/${val}`){console.log('======')}else{console.log('!=!=!=')}
                                     obj.date=uptime;
                                     obj.res_type=val.split('/')[1];//images or mp4
                                     obj.res_url=require(`../../../server/${val}`);
@@ -244,8 +241,7 @@
                     console.log(err);
                 })
             },
-            editClick(row){
-                //console.log(row);
+            editClick(row){//编辑某一行
                 this.form._id=row._id;
                 this.form.date=row.date;
                 this.form.res_type=row.res_type;
@@ -279,7 +275,7 @@
                 }
                 //return isJPG&&isLt500k;
             },
-            canceledit(){
+            canceledit(){//取消编辑
                 this.form._id='';
                 this.form.date='';
                 this.form.res_type='';
@@ -289,7 +285,7 @@
                 this.form.file='';
                 this.editdialogVisible=false;
             },
-            submitchange(){
+            submitchange(){//提交修改
                 var formdata=new FormData();
                 formdata.append('_id',this.form._id);
                 formdata.append('res_msg',this.form.res_msg);
@@ -325,12 +321,9 @@
                     }
                 }).catch(err=>{})
             },
-            deleteClick(row){
+            deleteClick(row){//删除行
                 var id=row._id;
                 var delete_url=row.delete_url;
-                console.log(id);
-                console.log(delete_url);
-                //var delete_msg=row.res_msg;
                 this.$axios.post('/api/upnewsrouter/deletepart',{_id:id,delete_url:delete_url}).then(res=>{
                     if(res.data=='删除成功'){
                         this.tableData.forEach(function (val,index,array) {
@@ -356,13 +349,13 @@
                 this.pagesize=val;
                 console.log(`每页 ${val} 条`);
             },
-            handleCurrentChange(val) {
+            handleCurrentChange(val) {//当前页改变时执行的函数
                 //console.log(`当前页: ${val}`);
             },
-            jumptoupnews(){
+            jumptoupnews(){//跳到上传页
                 this.$router.replace('/uploard');
             },
-            search(){
+            search(){//关键字搜索
                 if(!this.selectvalue2){
                     this.$message({
                         message:'请选择搜索类型',
@@ -378,7 +371,9 @@
                     return;
                 }
                 var searchtype=this.selectvalue2;
-                this.searchtableData=this.tableData.concat();
+                if(this.searchtableData.length==0){
+                    this.searchtableData=this.tableData.concat();
+                }
                 var temparr=[];
                 var pattern=new RegExp(this.keyword);
                 if(searchtype=='id'){
@@ -425,11 +420,11 @@
                 }
                 this.tableData=temparr;
             },
-            reflush(){
+            reflush(){//还原表格
                 this.tableData=this.searchtableData.concat();
                 this.searchtableData=[];
             },
-            sortbycol(){
+            sortbycol(){//列排序
                 if(!this.selectvalue){
                     this.$message({
                         message:'请选择排序列',
@@ -490,10 +485,10 @@
                     }
                 }
             },
-            handleSelectionChange(val){
+            handleSelectionChange(val){//将checkbox选中的所有数据给一个值
                 this.deletearr=val;
             },
-            deletesome(){
+            deletesome(){//批量删除
                 this.$confirm('确认删除？', '批量删除', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -541,11 +536,10 @@
             }
         },
         computed:{
-            totallength(){
+            totallength(){//总行数
                 return this.tableData.length;
             },
-            pagedata(){
-                //var pagelength=Math.floor(this.totallength/this.pagesize)+1;
+            pagedata(){//当前页的数据
                 return this.tableData.slice(this.pagesize*(this.currentpage-1),this.pagesize*this.currentpage);
             }
         },
@@ -559,6 +553,7 @@
 .managenews{
     width:1000px;
     margin:20px auto;
+    background-color: rgba(255,255,255,0.8);
     -moz-box-shadow: 1px 2px 4px rgba(0, 0, 0,0.5);
     -webkit-box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);
     box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);

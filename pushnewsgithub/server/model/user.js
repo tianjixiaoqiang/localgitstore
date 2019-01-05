@@ -1,7 +1,7 @@
 var mongoose=require('../db');
-var bcrypt=require('bcryptjs');
+var bcrypt=require('bcryptjs');//加密中间件
 var Schema = mongoose.Schema;
-var userSchema=new Schema({
+var userSchema=new Schema({//用户类
     username:{type:String,unique:true},
     password:'',
     role:{type:String,default:'普通用户'}
@@ -19,7 +19,7 @@ userSchema.pre('save',function (next) {
 });
 
 userSchema.methods={
-    comparePassword:function (_password,cb) {
+    comparePassword:function (_password,cb) {//设置一个比较密码的实例方法
         bcrypt.compare(_password,this.password,function (err,isMatch) {
             if(err)return cb(err);
             cb(null,isMatch)

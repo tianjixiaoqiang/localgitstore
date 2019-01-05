@@ -92,7 +92,7 @@ module.exports={
            }
        })
    },
-   autologin(req,res){
+   autologin(req,res){//自动登录，根据前端传过来的token判断
        var token=req.body.token;
        //console.log("ceshidaima 83");
        jwt.verify(token, 'tianjixiaoqiang',function (err,decoded) {
@@ -119,7 +119,7 @@ module.exports={
            });
        });
    },
-   logout(req,res){
+   logout(req,res){//退出系统，清空session
        req.session.destroy();
        //console.log('ceshidaima115');
        res.send('成功退出');

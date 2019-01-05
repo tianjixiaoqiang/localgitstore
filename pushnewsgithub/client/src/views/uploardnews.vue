@@ -204,10 +204,9 @@
             }
         },
         methods: {
-            showdialog(str){
+            showdialog(str){//显示表单
                 if(str=='图文混排'){
                     this.tuwenhunpai=true;
-                    //console.log('tuwenhunpai');
                 }
                 if(str=='视频文字混排'){
                     this.spwenzihunpai=true;
@@ -241,14 +240,12 @@
                 const isJPG = file.raw.type === 'image/jpeg'||file.raw.type === 'image/png';
                 const isLt500k = file.size / 1024  < 500;//小于500kb
                 if((ismp4&&isLt300m)||(isJPG&&isLt500k)){
-                    this.form3.newsbody.push({imgname:file.name,msg:''})
+                    this.form3.newsbody.push({imgname:file.name,msg:''});
                     this.form3.filelist.push(file);
                 }
             },
-            uploadnews(){
-               // console.log('172');
+            uploadnews(){//上传新闻
                if(!this.form.newstype||!this.form.newsbody||!this.form.writer||!this.form.label||!this.form.filelist){
-                  // console.log('125');
                    this.$message({
                        message: '请完善新闻的必要信息',
                        type: 'warning'
@@ -266,13 +263,11 @@
                formdata.append('resourse_desc',JSON.stringify(this.form.newsbody.map(function (value, index, array) {
                    return value;
                })));
-               //formdata.append('files',this.form.filelist[0].raw);
                 this.form.filelist.forEach(function (value, index, array) {
                     formdata.append('files',value.raw);
                 });
                var headerconfig={headers:{'Content-Type':'multipart/form-data'}};
                this.$axios.post('/api/upnewsrouter/upload',formdata,headerconfig).then(res=>{
-                   //console.log('201');
                   if(res.data){
                       this.$message({
                           message: '上传成功',
@@ -282,7 +277,7 @@
                }).catch(err=>{});
                this.canceldialog();
             },
-            uploadnews2(){
+            uploadnews2(){//上传新闻
                 if(!this.form2.newstype||!this.form2.newsbody||!this.form2.writer||!this.form2.label||!this.form2.filelist){
                     // console.log('125');
                     this.$message({
@@ -310,7 +305,6 @@
                     onUploadProgress: progressEvent => {
                         var complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
                         this.progress = complete;
-                        //console.log(complete);100
                     }
                 };
                 this.$axios.post('/api/upnewsrouter/upload',formdata,headerconfig).then(res=>{
@@ -324,9 +318,8 @@
                 });
                 this.canceldialog2();
             },
-            uploadnews3(){
+            uploadnews3(){//上传新闻
                 if(!this.form3.newstype||!this.form3.newsbody||!this.form3.writer||!this.form3.label||!this.form3.filelist){
-                    // console.log('125');
                     this.$message({
                         message: '请完善新闻的必要信息',
                         type: 'warning'
@@ -350,10 +343,8 @@
                 var headerconfig={
                     headers:{'Content-Type':'multipart/form-data'},
                     onUploadProgress: progressEvent => {
-                        console.log(progressEvent);
                         var complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
                         this.progress = complete;
-                       // console.log(complete);//100
                     }
                 };
                 this.$axios.post('/api/upnewsrouter/upload',formdata,headerconfig).then(res=>{
@@ -367,7 +358,7 @@
                 });
                 this.canceldialog3();
             },
-            canceldialog(){
+            canceldialog(){//取消上传
                 this.form.filelist=[];
                 this.form.label='';
                 this.form.newstype='';
@@ -377,7 +368,7 @@
                 this.tuwenhunpai = false;
                 this.$refs.upload.clearFiles();
             },
-            canceldialog2(){
+            canceldialog2(){//取消上传
                 this.form2.filelist=[];
                 this.form2.label='';
                 this.form2.newstype='';
@@ -387,7 +378,7 @@
                 this.spwenzihunpai = false;
                 this.$refs.upload2.clearFiles();
             },
-            canceldialog3(){
+            canceldialog3(){//取消上传
                 this.form3.filelist=[];
                 this.form3.label='';
                 this.form3.newstype='';
@@ -411,6 +402,7 @@
 .upload-news{
     width:1000px;
     margin:20px auto;
+    background-color: rgba(255,255,255,0.8);
     -moz-box-shadow: 1px 2px 4px rgba(0, 0, 0,0.5);
     -webkit-box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);
     box-shadow: 1px 2px 4px rgba(0, 0, 0, .5);

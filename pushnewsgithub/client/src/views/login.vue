@@ -9,7 +9,7 @@
           </el-form-item>
           <el-form-item>
                <el-button type="primary" @click="login">登录</el-button>
-               <el-button>取消</el-button>
+               <el-button @click="cancellogin">取消</el-button>
           </el-form-item>
         </el-form>
     </div>
@@ -74,11 +74,18 @@
                 }).catch(err=>{
                     console.log(err);
                 })
+            },
+            cancellogin(){
+                this.form.username='';
+                this.form.password='';
             }
         }
     }
 </script>
 
 <style lang="scss" scoped="" type="text/scss">
-
+.login-page{
+    width:500px;
+    margin:280px auto;
+}
 </style>

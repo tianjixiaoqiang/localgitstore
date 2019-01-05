@@ -9,7 +9,7 @@ var app=express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(session({
+app.use(session({//挂载session中间件
     secret:'tianjixiaoqiang',//设置加密字符串
     cookie: {maxAge: 1000*60*60*24*14 },
     resave: false,
@@ -18,7 +18,7 @@ app.use(session({
         mongooseConnection: mongoose.connection
     })
 }));
-for( let router of allrouters){
+for( let router of allrouters){//引用所有路由
     app.use('/api',router);
 }
 app.listen(3000);

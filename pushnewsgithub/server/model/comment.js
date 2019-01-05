@@ -1,6 +1,6 @@
 var mongoose=require('../db');
 var Schema = mongoose.Schema;
-var commentSchema=new Schema({
+var commentSchema=new Schema({//这里是评论类
     userid:'',
     username:'',
     msgbody:'',

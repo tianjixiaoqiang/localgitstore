@@ -21,13 +21,11 @@
             }
         },
         methods:{
-            logout(){
+            logout(){//登录系统
                 this.$confirm('确认退出？')
                     .then(()=> {
                         console.log('确认');
                         this.$axios.post('/api/userrouter/logout',{}).then(res=>{
-                            //console.log('242424242');
-                            //console.log(res.data);
                             if(res.data=='成功退出'){
                                 window.localStorage.removeItem('tjxqtoken');
                                 this.$store.commit('removeuser');
@@ -43,13 +41,10 @@
         },
         computed:{
             username(){
-                //console.log('232323')
-                //console.log(this.$store.state.user._id?false:true);//先输出true，在输出false
                 return this.$store.state.user._id?false:true;
             },
-            manager(){
+            manager(){//判断是否是管理员
                 if(this.$store.state.user.username=='天极小强'){
-                    //console.log('shi tjxq');
                     return true;
                 }else{
                     return false;

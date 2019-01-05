@@ -1,7 +1,4 @@
-//const userrouter=require('./router/userrouter');
-//const makefriendsrouter=require('./router/makefriendsrouter');
-//const selfcenterrouter=require('./router/selfcenterrouter');
-const upnewsrouter=require('./router/upnewsrouter');
+const upnewsrouter=require('./router/upnewsrouter');//这里引入后台的所有路由
 const userrouter=require('./router/userrouter');
 const commentrouter=require('./router/commentsrouter');
 var allrouters=[
