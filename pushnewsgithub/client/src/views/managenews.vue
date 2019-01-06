@@ -421,7 +421,9 @@
                 this.tableData=temparr;
             },
             reflush(){//还原表格
-                this.tableData=this.searchtableData.concat();
+                if(this.searchtableData.length>0){
+                    this.tableData=this.searchtableData.concat();
+                }
                 this.searchtableData=[];
             },
             sortbycol(){//列排序
